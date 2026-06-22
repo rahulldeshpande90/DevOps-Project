@@ -1,0 +1,145 @@
+DevOps Project
+
+dev server
+jenkins-master
+jenkins-slave
+
+(AMI:- Ubuntu Server 24.04 LTS (HVM),SSD Volume Type)
+
+===================
+
+dev server
+
+cd /root
+
+wget https://www.tooplate.com/zip-templates/2130_waso_strategy.zip
+
+apt-get update -y
+
+apt install unzip -y
+
+unzip 2130_waso_strategy.zip
+
+--------------------------
+
+cd /root/2130_waso_strategy
+
+vim Dockerfile
+
+FROM ubuntu
+RUN apt-get update -y
+RUN apt-get install -y apache2
+COPY . /var/www/html
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+
+--------------------------
+
+apt install git -y (optional)
+
+git init
+
+git add *
+
+git commit -m "Initial commit Waso Strategy Website"
+
+git remote add origin https://github.com/<your-username>/webserver-repo.git
+
+git push -u origin master
+
+=================
+
+On Ubuntu_Jenkins_Master
+
+apt update -y
+
+apt install fontconfig openjdk-21-jre -y
+
+wget -O /etc/apt/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+apt update -y
+
+apt install jenkins -y
+ 
+systemctl start jenkins
+
+vim /etc/sudoers
+jenkins ALL=(ALL) NOPASSWD: ALL
+
+-----------------------
+
+apt install git -y (optional)
+
+apt install docker.io -y
+
+systemctl start docker
+
+systemctl enable docker
+
+=================
+
+On github repo 
+
+Settings ---> add webhook
+
+http://jenkins_public_ip:8080/github-webhook/
+
+=================
+
+create job1 in Jenkins
+
+source code management--> git
+
+check github hook triger GITScm polling 
+
+Build Step --> Execute Shell
+
+sudo docker rm -f container1 || true
+sudo docker build -t webserver-image .
+sudo docker run -itd --name container1 -p 5000:80 webserver-image
+
+
+access --> http://<Jenkins-Master-Public-IP>:5000
+
+build manually for first time 
+
+=================
+
+Make changes after accessing webserver
+
+vim index.html
+git add *
+git commit -m "Updated index.html"
+git push origin master
+
+=================
+
+node 1 (slave)
+
+apt update -y 
+
+apt install fontconfig openjdk-21-jre -y
+
+apt install git -y (optional)
+
+apt install docker.io -y
+
+systemctl start docker
+
+systemctl enable docker
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
